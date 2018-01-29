@@ -1,0 +1,102 @@
+!###########################################################
+!###########################################################
+!###########################################################
+! if "withsource" is False, solve:
+! del^2 psi = q(i,j)
+! if "withsource" is True, solve:
+! del^2 psi = q(i,j) + 2/lambda^2*psi(i,j) 
+!###########################################################
+subroutine poisson(q,psi,withSource)
+  use params
+  implicit none
+  logical , intent(in)                            :: withSource
+  real(dp), dimension(0:nx+1,0:ny+1), intent(in ) :: q
+  real(dp), dimension(0:nx+1,0:ny+1), intent(out) :: psi
+  real(dp), dimension(0:nx+1,0:ny+1) :: psi_tmp
+  real(dp) :: eps,eps_init,fac,epsilon, omega
+  integer :: i,j,im1,ip1,jm1,jp1,itmax,iter
+
+  eps_init=0.d0 ; itmax=40000 ; omega=1.6!2./(1.+3.1415/nx)
+  psi_tmp=psi ; epsilon=1.d-4 !1.e-8
+  if (withSource) then
+     fac=1.d0/(2.d0*(dx**2+dy**2)/dx**2/dy**2+2.d0*LambdaInvSq)
+  else
+     fac=1.d0/(2.d0*(dx**2+dy**2)/dx**2/dy**2)
+  endif
+  do j=1,ny
+     jm1=j-1 ; jp1=j+1
+     do i=1,nx
+        im1=i-1 ; ip1=i+1
+        eps_init=max(eps_init,abs(((psi(ip1,j)+psi(im1,j))/dx**2+(psi(i,jp1)+psi(i,jm1))/dy**2)-q(i,j)-psi(i,j)/fac))
+     end do
+  end do
+  do iter=1,itmax
+     eps=0.d0
+     !red cells
+     do j=1,ny,2
+        jm1=j-1 ; jp1=j+1
+        do i=1,nx,2
+           im1=i-1 ; ip1=i+1
+           psi(i,j)=fac*((psi(ip1,j)+psi(im1,j))/dx**2+(psi(i,jp1)+psi(i,jm1))/dy**2-q(i,j))
+        end do
+     end do
+     do j=2,ny,2
+        jm1=j-1 ; jp1=j+1
+        do i=2,nx,2
+           im1=i-1 ; ip1=i+1
+           psi(i,j)=fac*((psi(ip1,j)+psi(im1,j))/dx**2+(psi(i,jp1)+psi(i,jm1))/dy**2-q(i,j))
+        end do
+     end do
+     ! Apply BC
+     call computeBCpoisson(psi,nx,ny)
+     ! black cells
+     do j=1,ny,2
+        jm1=j-1 ; jp1=j+1
+        do i=2,nx,2
+           im1=i-1 ; ip1=i+1
+           psi(i,j)=fac*((psi(ip1,j)+psi(im1,j))/dx**2+(psi(i,jp1)+psi(i,jm1))/dy**2-q(i,j))
+        end do
+     end do
+     do j=2,ny,2
+        jm1=j-1 ; jp1=j+1
+        do i=1,nx,2
+           im1=i-1 ; ip1=i+1
+           psi(i,j)=fac*((psi(ip1,j)+psi(im1,j))/dx**2+(psi(i,jp1)+psi(i,jm1))/dy**2-q(i,j))
+        end do
+     end do
+     ! SOR
+     psi=omega*psi+(1.d0-omega)*psi_tmp ; psi_tmp=psi
+     ! Apply BC
+     call computeBCpoisson(psi,nx,ny)
+     ! check convergence
+     do j=1,ny
+        jm1=j-1 ; jp1=j+1
+        do i=1,nx
+           im1=i-1 ; ip1=i+1
+           eps=max(eps,abs((psi(ip1,j)+psi(im1,j))/dx**2+(psi(i,jp1)+psi(i,jm1))/dy**2-q(i,j)-psi(i,j)/fac))
+           !write(*,*) withsource,i,j,fac,abs((psi(ip1,j)+psi(im1,j))/dx**2+(psi(i,jp1)+psi(i,jm1))/dy**2-q(i,j)-psi(i,j)/fac)
+        end do
+     end do
+!     write (*,*) withsource,iter,eps,eps_init
+     if ((abs(eps)<epsilon*abs(eps_init)).or.(abs(eps)<1.e-17)) exit
+!     if (abs(eps)<1.e-8) exit
+  end do
+  write (*,*) withsource,iter,eps,eps_init
+  return
+end subroutine poisson
+!###########################################################
+!###########################################################
+!###########################################################
+subroutine getPsi
+  use params
+  use variables
+  implicit none
+  real(dp), dimension(0:nx+1,0:ny+1) :: q_s,q_d,psi_s,psi_d
+  q_s=q(:,:,1)+q(:,:,2) ; q_d=q(:,:,1)-q(:,:,2)
+  psi_s=psi(:,:,1)+psi(:,:,2) ; psi_d=psi(:,:,1)-psi(:,:,2)
+  call poisson(q_s,psi_s,.false.)
+  call poisson(q_d,psi_d,.true.)
+  psi(:,:,1)=half*(psi_s+psi_d)
+  psi(:,:,2)=half*(psi_s-psi_d)
+  return
+end subroutine getPsi

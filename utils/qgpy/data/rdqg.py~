@@ -1,0 +1,72 @@
+import tables
+import numpy as np
+import netCDF4 as ncdf
+
+from utils.utils import str_suffix
+
+class qgData:
+    """ A class to read dump from QGbeta """
+
+    def __init__(self,rundir='./'):
+        #Dump directory name
+        self.rundir=rundir
+        return
+
+    def load(self,idump=1):
+        """ Read data in filename """
+
+        self.idump=idump
+
+        #Open file
+        filename=self.rundir+'output_'+str_suffix(idump)+'/'+'qgout.000000'
+        f=open(filename,'rb')
+
+        #Get simulations parameters from file
+        self.time=get_array(f,1,'f8')
+        dim=get_array(f,3,'i4')  ; [self.nx,self.ny,self.nlayers]=dim
+        params=get_array(f,2,'f8') ; [self.beta,self.Rrossby]=params
+
+        #Get ndim and allocate arrays
+        shape=(self.nlayers,self.ny+2,self.nx+2)
+                
+        #Get grid position and state variables
+        ntot=(self.nx+2)*(self.ny+2)*self.nlayers
+        self.x     =get_array(f,self.nx+2,'f8')[1:self.nx+1]
+        self.y     =get_array(f,self.ny+2,'f8')[1:self.ny+1]
+        self.q     =np.transpose(get_array(f,ntot,'f8').reshape(shape),(2,1,0))
+        self.psi   =np.transpose(get_array(f,ntot,'f8').reshape(shape),(2,1,0))
+        self.u     =np.transpose(get_array(f,ntot,'f8').reshape(shape),(2,1,0))
+        self.v     =np.transpose(get_array(f,ntot,'f8').reshape(shape),(2,1,0))
+        self.qbar  =np.transpose(get_array(f,ntot,'f8').reshape(shape),(2,1,0))
+        self.psibar=np.transpose(get_array(f,ntot,'f8').reshape(shape),(2,1,0))
+
+        #Close file
+        f.close()
+
+        return
+
+    def getVar(self,type='q',ilevel=0,ghost=False):
+        """ Return 2D variable of type at ilevel """
+        nx=self.nx ; ny=self.ny
+        imin=1 ; imax=nx+1
+        jmin=1 ; jmax=ny+1
+        if (ghost):
+            imin=0 ; imax=nx+2
+            jmin=0 ; jmax=ny+2
+        dicVar={'q'  : self.q[imin:imax,jmin:jmax,ilevel]+self.qbar[imin:imax,jmin:jmax,ilevel],\
+                'psi': self.psi[imin:imax,jmin:jmax,ilevel]+self.psibar[imin:imax,jmin:jmax,ilevel],\
+                'u'  : self.u[imin:imax,jmin:jmax,ilevel],\
+                'v'  : self.v[imin:imax,jmin:jmax,ilevel],\
+                'qbar'  : self.qbar[imin:imax,jmin:jmax,ilevel],\
+                'psibar': self.psibar[imin:imax,jmin:jmax,ilevel],\
+                'qprime'  : self.q[imin:imax,jmin:jmax,ilevel],\
+                'psiprime': self.psi[imin:imax,jmin:jmax,ilevel],\
+                'psiS': np.sum(self.psi[imin:imax,jmin:jmax,:]+self.psibar[imin:imax,jmin:jmax,:],2)}
+        return dicVar[type]
+
+def get_array(fid,nb_count,type):
+    bits_nb='i4'
+    pad=np.fromfile(fid,count=1,dtype=bits_nb)
+    array=np.fromfile(fid,count=nb_count,dtype=type)
+    pad=np.fromfile(fid,count=1,dtype=bits_nb)
+    return array

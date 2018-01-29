@@ -1,0 +1,149 @@
+from pylab import *
+
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+
+from qgpy.data import rdqg
+from qgpy.plot import plotTopo,qghist
+from atmos import twoDslices
+from atmos.utils import str_suffix
+
+def getMeanVar(istart,istop,type='psi',ghost=False,verbose=True):
+    """ Compute mean streamfunction """
+    for idump in range(istart,istop+1):
+        if verbose:
+            print "File number: ",idump
+        data=rdqg.qgData(idump=idump)
+        if (idump==istart):
+            varMean=data.getVar(type=type,ilevel=0,ghost=ghost)
+            nx,ny=varMean.shape
+        else:
+            varMean=varMean+data.getVar(type='psi',ilevel=0,ghost=ghost)
+    varMean=varMean/(istop-istart+1)
+    return varMean
+
+def getPsiVariance(istart,istop,psiMean):
+    """ Compute streamfunction variance """
+    for idump in range(istart,istop+1):
+        print "File number: ",idump
+        data=rdqg.qgData(idump=idump)
+        if (idump==istart):
+            nx,ny,nlayer=data.psi.shape ; nx=nx-2 ; ny=ny-2
+            psiVar=np.zeros((nx,ny))
+        psiVar=psiVar+(data.getVar(type='psi',ilevel=0)-psiMean)**2
+    psiVar=psiVar.transpose()/(istop-istart+1)
+    return psiVar
+
+def plotPsiVar(psi):
+    """ Plot psi contour lines in polar coordinates 
+    Need to include ghost cells to work """
+
+    # Transpose and flip psi, get sizes
+    psi=np.flipud(psi.transpose())
+    ydim,xdim=psi.shape
+
+    # extend of the box
+    rMin=1. ; rMax=4.
+    extent=[rMin,rMax,-np.pi/2.,3./2.*np.pi]
+
+    # Get plot coordinates for polar plot
+    xp,yp,ax=plotTopo.getCoord(xdim,ydim,extent)
+
+    # Make plot
+    #map1 = ax.pcolormesh(xp,yp,psi)
+    map1 = ax.contour(xp,yp,psi,20,colors='k',linestyles='solid')
+
+    # Add inner & outer circles
+    plotTopo.addCircles(ax,rMin,rMax)
+
+    # Add contour of topography
+    plotTopo.addTopo(ax,extent,xp,yp,ydim,xdim)
+
+    return
+   
+def modeHist(istart,istop,irange=0):
+    """ Plot time history of c2/c4 ratio """
+    n=istop-istart+1
+    times=np.zeros(n) ; c2overc4=np.zeros(n)
+    for idump in range(istart,istop+1):
+        print "File number: ",idump
+        data=rdqg.qgData(idump=idump)
+        meanpsi=np.mean(getMeanVar(idump-irange,idump+irange,verbose=False),1)
+#        meanpsi=np.mean(data.getVar(type='psi'),1)
+        times[idump-istart]=data.time[0]
+        c2,c4=getFFTCoeff(meanpsi,4,doPlot=False)
+        c2overc4[idump-istart]=c2/c4
+    plt.figure()
+    plt.plot(times,c2overc4)
+
+def getFFTCoeff(f,nmax,doPlot=True):
+    """ Plot approximation of f function up to nmax coefficient 
+    inclunding only even modes """
+    n=arange(0,nmax+1,2)
+    fftf=np.fft.rfft(f)[n]
+    an=2.*np.real(fftf)/f.size ; bn=2.*np.imag(fftf)/f.size
+    func=np.zeros(f.size)
+    for ival,nval in enumerate(n):
+        for i in range(f.size):
+            func[i]=func[i]+an[ival]*np.cos(2.*pi*nval/np.float(f.size)*i) \
+                           -bn[ival]*np.sin(2.*pi*nval/np.float(f.size)*i)
+    if (doPlot):
+        plt.figure()
+        plt.plot(f)
+        plt.plot(func)
+    return 2.*abs(fftf[1])/f.size,2.*abs(fftf[2])/f.size
+
+def getFlowState(dirname,dumpMaxVal=199,ndump=10):
+    """ Determine flow state (blocked vs. zonal) for steady state flow """
+    os.chdir(dirname)
+    psimean=np.mean(getMeanVar(dumpMaxVal-ndump,dumpMaxVal,verbose=False),1)
+    c2,c4=getFFTCoeff(psimean,4,doPlot=False)
+    os.chdir('../')
+    return c2,c4
+
+def getUmean(dirname,dumpMaxVal=199,ndump=10):
+    """ Determine flow mean zonal velocity from dumps for steady state flow """
+    os.chdir(dirname)
+    umean=np.mean(getMeanVar(dumpMaxVal-ndump,dumpMaxVal,type='u',verbose=False))
+    os.chdir('../')
+    return umean
+
+def getFlowStateSeq():
+    """ Determine flow state (blocked vs. zonal) for all runs contained in the current dir """
+    mydirectories=qghist.getDir() ; ndir=len(mydirectories)
+    idir=0
+    c2vals=np.zeros(1) ; c4vals=np.zeros(1) ; Avals=np.zeros(1) ; uvals=np.zeros(1)
+    for currdir in mydirectories:
+        print 'Directory:',currdir
+        print '   Number of remaining directories: ',ndir-idir ; idir=idir+1
+        c2,c4=getFlowState(currdir)
+        umean=getUmean(currdir)
+        if idir==1:
+            c2vals[0]=c2 ; c4vals[0]=c4 ; Avals[0]=np.float(currdir[1:])
+            uvals[0]=umean
+        else:
+            c2vals=np.append(c2vals,c2)
+            c4vals=np.append(c4vals,c4)
+            Avals=np.append(Avals,np.float(currdir[1:]))
+            uvals=np.append(uvals,umean)
+        print "   c2,c4=",c2,c4,c2/c4
+    sorted=np.argsort(Avals)
+    return Avals[sorted],c2vals[sorted],c4vals[sorted],uvals[sorted]
+
+def plotEq(zonal=True,superpose=False):
+    """ Plot sequence according to type of flow """
+    A,c2,c4,umean=getFlowStateSeq()
+    if (zonal):
+        selected=where(c2/c4>1)
+        fmt='k-o'
+    else:
+        selected=where(c2/c4<1)
+        fmt='k-^'
+    if not(superpose):
+        plt.figure()
+    plt.plot(A[selected],umean[selected],fmt,mfc='none')
+    plt.xlabel('Forcing amplitude, A')
+    plt.ylabel('Mean zonal velocity')
+    plt.xlim(0.,4.)
+    plt.ylim(0.,0.016)

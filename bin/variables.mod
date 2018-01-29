@@ -1,0 +1,121 @@
+GFORTRAN module version '6' created from ../src/commons.f90 on Mon Jan 29 16:24:09 2018
+MD5:b5ad74a9f107f5173a206443e14017d9 -- If you edit this, you'll get what you deserve.
+
+(() () () () () () () () () () () () () () () () () () () () () () ()
+() () () ())
+
+()
+
+()
+
+()
+
+()
+
+()
+
+(2 'dp' 'precision' 'dp' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '8') () 0 () () () 0 0)
+3 'dqdt' 'variables' 'dqdt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0
+0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+4 'dsqdt' 'variables' 'dsqdt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+5 'dsqdtm1' 'variables' 'dsqdtm1' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+6 'dsqdtm2' 'variables' 'dsqdtm2' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+7 'dt' 'variables' 'dt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+8 'kind' '(intrinsic)' 'kind' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 FUNCTION) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 8 ()
+() () 0 0)
+9 'ndump' 'variables' 'ndump' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () ()
+() 0 0)
+10 'precision' 'precision' 'precision' 1 ((MODULE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
+() () () 0 0)
+11 'psi' 'variables' 'psi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0
+0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+12 'psibar' 'variables' 'psibar' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0
+0 REAL ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+13 'q' 'variables' 'q' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (3
+0 DEFERRED () () () () () ()) 0 () () () 0 0)
+14 'qbar' 'variables' 'qbar' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0
+0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+15 'qm1' 'variables' 'qm1' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0
+0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+16 'qp1' 'variables' 'qp1' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0
+0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+17 'sp' 'precision' 'sp' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 INTEGER ()) 0 0 () (CONSTANT (
+INTEGER 4 0 0 INTEGER ()) 0 '8') () 0 () () () 0 0)
+18 'spsi' 'variables' 'spsi' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+19 'spsibar' 'variables' 'spsibar' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+20 'spsim1' 'variables' 'spsim1' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+21 'spsim2' 'variables' 'spsim2' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+22 'sq' 'variables' 'sq' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+23 'sqbar' 'variables' 'sqbar' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+24 'sqm1' 'variables' 'sqm1' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+25 'sqm2' 'variables' 'sqm2' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+26 'sqp1' 'variables' 'sqp1' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+27 'su' 'variables' 'su' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+28 'sv' 'variables' 'sv' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 COMPLEX
+()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
+29 'time' 'variables' 'time' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+30 'u' 'variables' 'u' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (3
+0 DEFERRED () () () () () ()) 0 () () () 0 0)
+31 'v' 'variables' 'v' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (3
+0 DEFERRED () () () () () ()) 0 () () () 0 0)
+32 'variables' 'variables' 'variables' 1 ((MODULE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0
+() () () 0 0)
+33 'x' 'variables' 'x' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1
+0 DEFERRED () ()) 0 () () () 0 0)
+34 'y' 'variables' 'y' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1
+0 DEFERRED () ()) 0 () () () 0 0)
+)
+
+('dp' 0 2 'dqdt' 0 3 'dsqdt' 0 4 'dsqdtm1' 0 5 'dsqdtm2' 0 6 'dt' 0 7
+'kind' 0 8 'ndump' 0 9 'precision' 0 10 'psi' 0 11 'psibar' 0 12 'q' 0
+13 'qbar' 0 14 'qm1' 0 15 'qp1' 0 16 'sp' 0 17 'spsi' 0 18 'spsibar' 0
+19 'spsim1' 0 20 'spsim2' 0 21 'sq' 0 22 'sqbar' 0 23 'sqm1' 0 24 'sqm2'
+0 25 'sqp1' 0 26 'su' 0 27 'sv' 0 28 'time' 0 29 'u' 0 30 'v' 0 31
+'variables' 0 32 'x' 0 33 'y' 0 34)
