@@ -3,14 +3,6 @@
 # Possible choice are: undefined, INTEL, MACOSX, COAST, PGF90, INTEL_TITANE, 
 # INTEL_GRAPHI, TURING
 #############################################################################
-# Compilation time parameters
-#NDIM     = 3
-#WITHMPI  = 1
-#HDF5     = 0
-#PARAHDF5 = 0
-#PNETCDF  = 1
-#ISO      = 0
-#############################################################################
 PATCH = ../patch/forcedJet
 #############################################################################
 
@@ -47,15 +39,15 @@ MPILIB_LOCAL   = -L/usr/lib/openmpi/lib -lmpi -lmpi_f77
 CPPFLAGS_LOCAL = -x f95-cpp-input -DSYSTEM
 FFLAGS_LOCAL   = -ffast-math -ffree-line-length-0 -O3
 ifeq ($(PARAHDF5),1)
-HDFINC_LOCAL   = -I/local/home/mjoos/soft/hdf5-para/include/
-HDFLIB_LOCAL   = -L/local/home/mjoos/soft/hdf5-para/lib -lhdf5_fortran -lhdf5 -lz
+HDFINC_LOCAL   = 
+HDFLIB_LOCAL   = 
 else
-HDFINC_LOCAL   = -I/local/home/mjoos/soft/build/include/
-HDFLIB_LOCAL   = -L/local/home/mjoos/soft/build/lib -lhdf5_fortran -lhdf5
+HDFINC_LOCAL   = 
+HDFLIB_LOCAL   = 
 endif
 ifeq ($(PNETCDF),1)
-CDFINC_LOCAL   = -I/local/home/mjoos/soft/build/include/
-CDFLIB_LOCAL   = -L/local/home/mjoos/soft/build/lib -lpnetcdf
+CDFINC_LOCAL   = 
+CDFLIB_LOCAL   = 
 else
 CDFINC_LOCAL   = 
 CDFLIB_LOCAL   = 
@@ -193,15 +185,17 @@ endif
 # Source directory
 VPATH=$(PATCH):../mpi:../src:../output
 #############################################################################
-#INC    = -I/opt/local/include/
-#LIB    = -I/opt/local/include/ -L/opt/local/lib/
+#INC   = -I/dsm/mri/data4/sfromang/usr/fftw-3.3.6/include
+#LIB   = -L../fftpack5.1/lib -L/dsm/mri/data4/sfromang/usr/fftw-3.3.6/lib -lfftpack -lfftw3
+INC   = -I/Users/sfromang/usr/fftw-3.3.6/include
+LIB   = -L/Users/sfromang/usr/fftw-3.3.6/lib -lfftw3
 #############################################################################
 # All objects
 MPI_MODULEOBJ = 
 MPIOBJ        = 
 
 MODULEOBJ = commons.o user_commons.o
-MHDOBJ = condinit.o source_term.o init.o output.o scheme.o poisson.o boundary.o QGbeta.o
+MHDOBJ = condinit.o user_restart.o fftrtools.o fftctools.o source_term.o init.o output.o history.o scheme.o poissonfft.o boundary.o QGbeta.o 
 
 ifeq ($(WITHMPI),1)
 ALLOBJ = $(MPI_MODULEOBJ) $(MODULEOBJ) $(MHDOBJ) $(MPIOBJ)
@@ -210,10 +204,10 @@ ALLOBJ = $(MODULEOBJ) $(MHDOBJ)
 endif
 #############################################################################
 %.o:%.f90
-	$(F90) $(HDFINC) $(CDFINC) $(FLAGS) $(CPPFLAGS) -c $^ -o $@
+	$(F90) $(INC) $(FLAGS) $(CPPFLAGS) -c $^ -o $@
 #############################################################################
-dumses: $(ALLOBJ) 
-	$(F90) $(FLAGS) -o ./QGbeta $(ALLOBJ) $(HDFLIB) $(CDFLIB) $(LIBS) $(MPILIB)
+QGbeta: $(ALLOBJ) 
+	$(F90) $(FLAGS) -o ./QGbeta $(ALLOBJ) $(HDFLIB) $(CDFLIB) $(LIB) $(MPILIB)
 #############################################################################
 clean:
 	rm *.o *.mod 

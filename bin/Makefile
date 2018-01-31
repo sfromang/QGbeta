@@ -185,8 +185,10 @@ endif
 # Source directory
 VPATH=$(PATCH):../mpi:../src:../output
 #############################################################################
-INC   = -I/Users/sfromang/usr/fftw-3.3.7/include
-LIB   = -L/Users/sfromang/usr/fftw-3.3.7/lib -lfftw3
+#INC   = -I/dsm/mri/data4/sfromang/usr/fftw-3.3.6/include
+#LIB   = -L../fftpack5.1/lib -L/dsm/mri/data4/sfromang/usr/fftw-3.3.6/lib -lfftpack -lfftw3
+INC   = -I/Users/sfromang/usr/fftw-3.3.6/include
+LIB   = -L/Users/sfromang/usr/fftw-3.3.6/lib -lfftw3
 #############################################################################
 # All objects
 MPI_MODULEOBJ = 
