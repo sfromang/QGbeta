@@ -1,4 +1,0 @@
-subroutine f2sf(f,sf)
-  implicit none
-  return
-end subroutine f2sf

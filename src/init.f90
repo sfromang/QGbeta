@@ -39,7 +39,7 @@ subroutine read_params
   use variables
   implicit none
   namelist /start_params/restart,tlim,verbose
-  namelist /scheme_params/nx,ny,nlayers,typeBc,dtvalue
+  namelist /scheme_params/nx,ny,nlayers,typeBc,dt,cfl
   namelist /model_params/xmin,xmax,ymin,ymax,beta,lambda
   namelist /output_params/dtdump,dthist
 
@@ -79,7 +79,8 @@ subroutine default_params
   restart=0
   tlim=1.d5
   dt=2.d2
-  dtvalue=0.d0
+  dt=0.d0
+  cfl=-1.d0
 
   ! Output default parameters
   dtdump=1.d3

@@ -15,11 +15,13 @@ subroutine getUpdate
   ! Compute velocities from streamfunction & timestep
   call spsi2su(spsi,su,nx,ny,nlayers,2.d0*pi/(ymax-ymin)) ! Compute u in spectral space
   call spsi2sv(spsi,sv,nx,ny,nlayers,2.d0*pi/(xmax-xmin)) ! Compute v in spectral space
-  !dt=0.05*min(dx/maxval(abs(u)),dy/maxval(abs(v)))
-  !dt=0.025*min(dx/maxval(abs(u)),dy/maxval(abs(v)))
-  !dt=500.
-  dt=250.
-  !dt=min(dt,1.d3) ; dt=5.d2 !; dt=1.d-3
+
+  ! Compute dt according to CFL condition (if needed)
+  if (cfl>0.d0) then
+     call su2u(su,u,nx,ny,nlayers)                           ! Transform u back to real space
+     call svar2var(sv,v,nx,ny,nlayers)                       ! Transform v back to real space
+     dt=cfl*min(dx/maxval(abs(u)),dy/maxval(abs(v)))
+  endif
 
   ! Compute time derivative from velocities and vorticity
   call computeTimeDerivative(sq,su,sv,dsqdt)
