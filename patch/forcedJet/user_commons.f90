@@ -6,6 +6,5 @@ module user_params
   real(dp), dimension(:,:), allocatable :: psiJet !< Forced streamfunction
 
   real(dp) :: tau,tauM                            !< Forcing & frictionnal timescales
-  real(dp) :: nuH                                 !< Hyperdiffusion coefficient
 
 end module user_params

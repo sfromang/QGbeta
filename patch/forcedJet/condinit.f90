@@ -9,7 +9,7 @@ subroutine condinit
   integer :: i,j,iseed,ilayer
   real rvalue
   real(dp) :: amp
-  namelist /init_params/Umax,sigma,tau,tauM,nuH
+  namelist /init_params/Umax,sigma,tau,tauM
 
   if (verbose) write (*,*) "Entering condinit.f90..."
 

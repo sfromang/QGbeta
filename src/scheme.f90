@@ -24,7 +24,7 @@ subroutine getUpdate
   endif
 
   ! Compute time derivative from velocities and vorticity
-  call computeTimeDerivative(sq,su,sv,dsqdt)
+  call computeTimeDerivative(sq,spsi,su,sv,dsqdt)
 
   ! Add source term
   call source_term
@@ -56,11 +56,11 @@ end subroutine getUpdate
 !###########################################################
 !###########################################################
 !###########################################################
-subroutine computeTimeDerivative(sq,su,sv,dsqdt)
+subroutine computeTimeDerivative(sq,spsi,su,sv,dsqdt)
   use params
   implicit none
 
-  complex(dp), dimension(1:nx,1:ny,1:nlayers), intent(in ) :: sq,su,sv
+  complex(dp), dimension(1:nx,1:ny,1:nlayers), intent(in ) :: sq,spsi,su,sv
   complex(dp), dimension(1:nx,1:ny,1:nlayers), intent(out) :: dsqdt
 
   complex(dp), dimension(1:nx,1:ny,1:nlayers) :: sduqdx,sdvqdy,dsqdy,dsqdx
@@ -71,6 +71,7 @@ subroutine computeTimeDerivative(sq,su,sv,dsqdt)
   call dealiasing(su,nx,ny,nlayers)
   call dealiasing(sv,nx,ny,nlayers)
 
+  ! PV advection by velocities
   if (typeBC==1) then
 
      ! Compute d(uq)/dx in spectral space
@@ -104,6 +105,9 @@ subroutine computeTimeDerivative(sq,su,sv,dsqdt)
 
   dsqdt=dsqdt-sduqdx-sdvqdy-beta*sv
 
+  ! Compute small scale dissipation
+  call dissip(spsi,dsqdt)
+
   return
 end subroutine computeTimeDerivative
 !###########################################################
@@ -123,6 +127,28 @@ subroutine dealiasing(svar,nx,ny,nlayers)
 
   return
 end subroutine dealiasing
+!###########################################################
+!###########################################################
+!###########################################################
+subroutine dissip(spsi,dsqdt)
+  use params
+  implicit none
+
+  complex(dp), dimension(1:nx,1:ny,1:nlayers), intent(in ) :: spsi
+  complex(dp), dimension(1:nx,1:ny,1:nlayers), intent(out) :: dsqdt
+  complex(dp), dimension(nx,ny,nlayers) :: sdissip
+
+  ! 6th order small scale hyperdiffusion
+  sdissip=spsi
+  call delSq(sdissip,nx,ny,nlayers)
+  call delSq(sdissip,nx,ny,nlayers)
+  call delSq(sdissip,nx,ny,nlayers)
+  sdissip=nuH*sdissip
+
+  dsqdt = dsqdt - sdissip
+
+  return
+end subroutine dissip
 !###########################################################
 !###########################################################
 !###########################################################

@@ -68,6 +68,7 @@ module params
   real(dp) :: xmax           !< maximum x coordinate
   real(dp) :: ymin           !< minimum y coordinate
   real(dp) :: ymax           !< maximum y coordinate
+  real(dp) :: nuH            !< Hyperdiffusion coefficient
   real(dp) :: cfl            !< set CFL to a specific value (default: -1. => indicate cst dt)
 
   ! Mesh and wavenumbers parameters

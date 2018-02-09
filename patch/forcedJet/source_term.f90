@@ -27,18 +27,5 @@ subroutine source_term
   ! Add bottom layer dissipation to PV tendency
   dsqdt = dsqdt - sxi/tauM
 
-  ! 6th order hyperdiffusion
-  !sdissip=spsim1 !This is for leapfrog scheme
-  sdissip=spsi
-  call delSq(sdissip,nx,ny,nlayers)
-  call delSq(sdissip,nx,ny,nlayers)
-  call delSq(sdissip,nx,ny,nlayers)
-  sdissip=nuH*sdissip
-
-  !sdissip=-8.e6*sdissip
-
-  ! Add small scale hyperdiffusion to PV tendency
-  dsqdt = dsqdt - sdissip
-
   return
 end subroutine source_term

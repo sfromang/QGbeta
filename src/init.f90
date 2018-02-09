@@ -40,7 +40,7 @@ subroutine read_params
   implicit none
   namelist /start_params/restart,tlim,verbose
   namelist /scheme_params/nx,ny,nlayers,typeBc,dt,cfl
-  namelist /model_params/xmin,xmax,ymin,ymax,beta,lambda
+  namelist /model_params/xmin,xmax,ymin,ymax,beta,lambda,nuH
   namelist /output_params/dtdump,dthist
 
   call default_params
@@ -78,7 +78,6 @@ subroutine default_params
   ! Time default parameters
   restart=0
   tlim=1.d5
-  dt=2.d2
   dt=0.d0
   cfl=-1.d0
 
@@ -89,6 +88,7 @@ subroutine default_params
   ! Model physical parameters
   beta=0.d0    ! Perform simulations on the f-plane (Oruba: 4.8e-11)
   lambda=4.5d5 ! Default Rossby deformation radius (in m)
+  nuH=0.d0     ! Hyperdiffusion coefficient (none by default)
 
   ! Boundary conditions
   typeBC=1    !=1 (periodic); =2 (P.Williams type)

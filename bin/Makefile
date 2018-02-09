@@ -3,7 +3,7 @@
 # Possible choice are: undefined, INTEL, MACOSX, COAST, PGF90, INTEL_TITANE, 
 # INTEL_GRAPHI, TURING
 #############################################################################
-PATCH = ../patch/forcedJet
+PATCH = ../patch/forcedJetwithTopo
 #############################################################################
 
 ifeq ($(HDF5),1)
