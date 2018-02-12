@@ -204,16 +204,16 @@ subroutine computeForcing
      end do
   endif
 
+  ! Copy same mean state in both layers in case of two layers
+  if (nlayers==2) then
+     qbar  (:,:,2)=  qbar(:,:,1)
+     psibar(:,:,2)=psibar(:,:,1)
+  endif
+
   ! Dirichlet lateral BC (with psi=0)
   call var2svar(qbar,sqbar,nx,ny,nlayers)
   call sq2spsi(sqbar,spsibar,nx,ny,nlayers)
   call svar2var(spsibar,psibar,nx,ny,nlayers)
-
-  ! Copy same mean state in both layers in case of two layers
-  if (nlayers==2) then
-     sqbar  (:,:,2)=  sqbar(:,:,1)
-     spsibar(:,:,2)=spsibar(:,:,1)
-  endif
 
   return
 end subroutine computeForcing

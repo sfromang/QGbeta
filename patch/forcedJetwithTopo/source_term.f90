@@ -34,8 +34,8 @@ subroutine source_term
   call svar2var(sv,v,nx,ny,nlayers)
   do j=1,ny
      do i=1,nx
-        dqdt(i,j,nlayers)=- (hB(i+1,j)*u(i+1,j,nlayers)-hB(i-1,j)*u(i-1,j,nlayers))/2.d0/dx \
-                          - (hB(i,j+1)*v(i,j+1,nlayers)-hB(i,j-1)*v(i,j-1,nlayers))/2.d0/dy
+        dqdt_topo(i,j,nlayers) = - (hB(i+1,j)*u(i+1,j,nlayers)-hB(i-1,j)*u(i-1,j,nlayers))/2.d0/dx \
+                                 - (hB(i,j+1)*v(i,j+1,nlayers)-hB(i,j-1)*v(i,j-1,nlayers))/2.d0/dy
      end do
   end do
   call var2svar(dqdt_topo,dsqdt_topo,nx,ny,nlayers)
