@@ -36,6 +36,11 @@ subroutine history
 
   if (verbose) print*, "> Writing history..."
 
+  ! Compute zonal velocity in real space from PV in spectral space
+  call sq2spsi(sq,spsi,nx,ny,nlayers)
+  call spsi2su(spsi,su,nx,ny,nlayers,2.d0*pi/(ymax-ymin)) ! Compute u in spectral space
+  call su2u(su,u,nx,ny,nlayers)                           ! Transform u back to real space
+
   ! Compute zonal velocity at probe location and averaged over the channel
   ! xprobe=10.116d0 ; yprobe=0.d0
   !xprobe=3.71d0 ; yprobe=0.d0
