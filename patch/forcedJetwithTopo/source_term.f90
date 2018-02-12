@@ -9,6 +9,8 @@ subroutine source_term
   implicit none
   real(dp), dimension(0:nx+1,0:ny+1) :: xi
   real(dp), dimension(0:nx+1,0:ny+1,nlayers) :: dtmp,dterm
+  real(dp), dimension(0:nx+1,0:ny+1,1:nlayers)  :: dqdt_topo
+  complex(dp), dimension(1:nx,1:ny,1:nlayers)  :: dsqdt_topo
   real(dp) :: psiR
   integer :: ilayer,i,j
   !forcing parameters
@@ -26,35 +28,33 @@ subroutine source_term
      dsqdt(:,:,ilayer)=dsqdt(:,:,ilayer)-kappa*(sq(:,:,ilayer)-sqbar(:,:,ilayer))
   end do
 
-  ! Bottom layer dissipation
-  if (nlayers==2) then
-     !call getVorticity(psi(:,:,2)+psibar(:,:,2),xi)
-     call getVorticity(psi(:,:,2),xi)
-     dqdt(:,:,2)=dqdt(:,:,2)-xi/tauM
-  endif
-
   ! Bottom layer topography
+  dqdt_topo=0.d0 ; dsqdt_topo=0.d0
+  call su2u(su,u,nx,ny,nlayers)
+  call svar2var(sv,v,nx,ny,nlayers)
   do j=1,ny
      do i=1,nx
-        dqdt(i,j,nlayers)=dqdt(i,j,nlayers)-\
-                       (hB(i+1,j)*u(i+1,j,nlayers)-hB(i-1,j)*u(i-1,j,nlayers))/2.d0/dx-\
-                       (hB(i,j+1)*v(i,j+1,nlayers)-hB(i,j-1)*v(i,j-1,nlayers))/2.d0/dy
+        dqdt(i,j,nlayers)=- (hB(i+1,j)*u(i+1,j,nlayers)-hB(i-1,j)*u(i-1,j,nlayers))/2.d0/dx \
+                          - (hB(i,j+1)*v(i,j+1,nlayers)-hB(i,j-1)*v(i,j-1,nlayers))/2.d0/dy
      end do
   end do
+  call var2svar(dqdt_topo,dsqdt_topo,nx,ny,nlayers)
+  dsqdt=dsqdt+dsqdt_topo
 
-  ! Noise forcing (amp=1.d0 for first model that worked)
-  !call getNoise(.true.,.true.,dt)
-  call getNoiseAmp(time)            ! return noise amplitude
-  call getNoise(dt) ! return noise with values between -0.5 and 0.5
-  do j=1,ny
-     do i=1,nx
-        !call random_number(rvalue)
-        do ilayer=1,nlayers
-           sign=(-1)**(ilayer+1)
-           dqdt(i,j,ilayer)=dqdt(i,j,ilayer)+2.d0*sign*noiseAmp*noise(i,j)
-        end do
-     end do
-  end do
+  ! TBD FOR FFT VERSION - SEB - 12/02/18
+  ! ! Noise forcing (amp=1.d0 for first model that worked)
+  ! !call getNoise(.true.,.true.,dt)
+  ! call getNoiseAmp(time)            ! return noise amplitude
+  ! call getNoise(dt) ! return noise with values between -0.5 and 0.5
+  ! do j=1,ny
+  !    do i=1,nx
+  !       !call random_number(rvalue)
+  !       do ilayer=1,nlayers
+  !          sign=(-1)**(ilayer+1)
+  !          dqdt(i,j,ilayer)=dqdt(i,j,ilayer)+2.d0*sign*noiseAmp*noise(i,j)
+  !       end do
+  !    end do
+  ! end do
 
   return
 end subroutine source_term
