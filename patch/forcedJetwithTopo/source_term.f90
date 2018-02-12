@@ -23,16 +23,8 @@ subroutine source_term
   call getForcingAmp(time)
   if (varForcing) call computeForcing
   do ilayer=1,nlayers
-     !dqdt(:,:,ilayer)=dqdt(:,:,ilayer)-kappa*q(:,:,ilayer)
-     dqdt(:,:,ilayer)=dqdt(:,:,ilayer)-kappa*(q(:,:,ilayer)-qbar(:,:,ilayer))
+     dsqdt(:,:,ilayer)=dsqdt(:,:,ilayer)-kappa*(sq(:,:,ilayer)-sqbar(:,:,ilayer))
   end do
-
-  ! 4th order hyperdiffusion
-  call getDelSq(qm1,dtmp)
-  dterm(:,:,:)=nuH*dtmp(:,:,:)
-
-  ! Small scale hyperdiffusion
-  dqdt=dqdt+dterm
 
   ! Bottom layer dissipation
   if (nlayers==2) then
@@ -115,38 +107,38 @@ subroutine getNoise(dt)
   end do
   if ((.not.(redSpace)).and.(.not.(redTime))) noise=noise-5.d-1
 
-  ! Next generate red noise (in space)
-  ! the cut-off frequency w0 corresponds to a cut-off wavelength lambda ~ 1/w0 expressed in cells!!!
-  ! so beware that the noise is resolution dependent!!!
-  ! when doubling the resolution, w0 must be decreased by a factor of two to keep noise the same
-  if (redSpace) then
-     fftNoise=noise(1:nx,1:ny)
-     call cfft2f(nx,nx,ny,fftNoise,wsave,lensav,work,lenwrk,ierr)
-     fftNoise(1,1)=0.d0
-     do j=1,ny
-        do i=1,nx
-           di = nx/2 + 1 - i
-           dj = ny/2 + 1 - j
-           waveno = sqrt( (0.5d0-abs(real(di))/real(nx))**2 + (0.5d0-abs(real(dj))/real(ny))**2 )
-           fftNoise(i,j) = fftNoise(i,j) * exp(-((waveno-w0)/dw0)**2) ! Gaussian cut-off
-           !fftNoise(i,j) = fftNoise(i,j) * exp(-((waveno-0.04d0)/0.01d0)**2) ! Gaussian cut-off
-           !fftNoise(i,j) = fftNoise(i,j) * exp(-(abs(waveno/0.05d0))) ! Red noise
-        end do
-     end do
-     call cfft2b(nx,nx,ny,fftNoise,wsave,lensav,work,lenwrk,ierr)
-     noise(:,:) = real(fftNoise)
-     noise = noise / max(maxval(noise),-minval(noise)) / 2.d0
-  endif
+  ! ! Next generate red noise (in space)
+  ! ! the cut-off frequency w0 corresponds to a cut-off wavelength lambda ~ 1/w0 expressed in cells!!!
+  ! ! so beware that the noise is resolution dependent!!!
+  ! ! when doubling the resolution, w0 must be decreased by a factor of two to keep noise the same
+  ! if (redSpace) then
+  !    fftNoise=noise(1:nx,1:ny)
+  !    call cfft2f(nx,nx,ny,fftNoise,wsave,lensav,work,lenwrk,ierr)
+  !    fftNoise(1,1)=0.d0
+  !    do j=1,ny
+  !       do i=1,nx
+  !          di = nx/2 + 1 - i
+  !          dj = ny/2 + 1 - j
+  !          waveno = sqrt( (0.5d0-abs(real(di))/real(nx))**2 + (0.5d0-abs(real(dj))/real(ny))**2 )
+  !          fftNoise(i,j) = fftNoise(i,j) * exp(-((waveno-w0)/dw0)**2) ! Gaussian cut-off
+  !          !fftNoise(i,j) = fftNoise(i,j) * exp(-((waveno-0.04d0)/0.01d0)**2) ! Gaussian cut-off
+  !          !fftNoise(i,j) = fftNoise(i,j) * exp(-(abs(waveno/0.05d0))) ! Red noise
+  !       end do
+  !    end do
+  !    call cfft2b(nx,nx,ny,fftNoise,wsave,lensav,work,lenwrk,ierr)
+  !    noise(:,:) = real(fftNoise)
+  !    noise = noise / max(maxval(noise),-minval(noise)) / 2.d0
+  ! endif
 
-  ! Finally generate red noise in time
-  if (redTime) then
-     ! Correlation coeff for temporally red noise
-     !tcorr= 0.1d0 !1.d0 (ok transition), with wavenumber 0.05
-     tcorr= 1.d0 !(ok transition), with wavenumber 0.05
-     rcoeff=0.d0 !0.95d0
-     !rcoeff=1.d0-dt/tcorr
-     noise=savNoise*rcoeff+sqrt(1.d0-rcoeff**2)*noise
-  endif
+  ! ! Finally generate red noise in time
+  ! if (redTime) then
+  !    ! Correlation coeff for temporally red noise
+  !    !tcorr= 0.1d0 !1.d0 (ok transition), with wavenumber 0.05
+  !    tcorr= 1.d0 !(ok transition), with wavenumber 0.05
+  !    rcoeff=0.d0 !0.95d0
+  !    !rcoeff=1.d0-dt/tcorr
+  !    noise=savNoise*rcoeff+sqrt(1.d0-rcoeff**2)*noise
+  ! endif
 
   ! Save copy of noise
   savNoise=noise

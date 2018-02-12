@@ -11,7 +11,7 @@ subroutine condinit
   real(dp) :: rvalue
   real(dp) :: amp,f1,f2,y0,y1,factor,scaling
   namelist /init_params/forcingType,varForcing,A,Amin,Amax,Ainc,kappa,\
-                        nuH,topoType,h0,amp,noiseAmp,tauM,w0,dw0,\
+                        topoType,h0,amp,noiseAmp,tauM,w0,dw0,\
                         varNoise,noiseMinAmp,noiseMaxAmp,noiseInc,\
                         redTime,redSpace,scaling
 
@@ -53,6 +53,11 @@ subroutine condinit
   ! Compute vorticity forcing
   call getForcingAmp(time)
   call computeForcing
+  do j=1,ny
+     do i=1,nx
+        write (*,*) 'yo',i,j,sqbar(i,j,1)
+     end do
+  end do
 
   ! Initial flow
   call initRandom
@@ -73,6 +78,9 @@ subroutine condinit
   ! Compute PV
   call getQ(psi,q) ; call computeBC(q,nx,ny,nlayers)
 
+  write (*,*) maxval(psibar)
+  stop
+
   ! Initial flow from existing equilibrium state (stored in files zonal.bin and blocked.bin)
   if (scaling>=0) then
      call computeInitFlow(scaling)
@@ -89,6 +97,23 @@ subroutine condinit
   !u(1:nx,1:ny,1)=noise
   !call output
   !stop
+
+  ! Compute FFT and store variable in spectral space
+  call var2svar(psibar,spsibar,nx,ny,nlayers)
+  call var2svar(q,sq,nx,ny,nlayers)
+  call var2svar(psi,spsi,nx,ny,nlayers)
+  call svar2var(spsi,psi,nx,ny,nlayers)
+  call spsi2sq(spsi,sq,nx,ny,nlayers,LambdaInvSq)
+  call svar2var(sq,q,nx,ny,nlayers)
+  call computeBCzeroGrad(q,nx,ny,nlayers)
+  call computeBCzeroGrad(psi,nx,ny,nlayers)
+
+  ! Compute other variables (qm1,u,v) for saving purposes.
+  sqm1=sq
+  call spsi2su(spsi,su,nx,ny,nlayers,2.d0*pi/(ymax-ymin)) ! Compute u in spectral space
+  call su2u(su,u,nx,ny,nlayers)                           ! Transform u back to real space
+  call spsi2sv(spsi,sv,nx,ny,nlayers,2.d0*pi/(xmax-xmin)) ! Compute v in spectral space
+  call svar2var(sv,v,nx,ny,nlayers)                       ! Transform v back to real space
 
   return
 end subroutine condinit
@@ -165,7 +190,7 @@ end subroutine computeInitFlow
 !===============================================================================
 subroutine computeForcing
   use params
-  use variables , only : qbar,psibar,y
+  use variables , only : qbar,psibar,sqbar,spsibar,y
   use user_params , only : forcingType,A
   implicit none
   real(dp) :: y0,y1,factor,f1,f2
@@ -179,6 +204,7 @@ subroutine computeForcing
         f1=-(y(j)-y1)**2/y0**2
         f2=-(y(j)+y1)**2/y0**2
         qbar(0:nx+1,j,1)=A*(exp(f1)-7.d0/13.d0*exp(f2))
+        write (*,*) j,qbar(0:nx+1,j,1)
      end do
   endif
   if (forcingType=='charney') then
@@ -188,13 +214,14 @@ subroutine computeForcing
   endif
 
   ! Dirichlet lateral BC (with psi=0)
-  call poissonfft(qbar(:,:,1),psibar(:,:,1),.false.,.false.,.true.,.false.)
-  call computeBCzeroGrad(psibar,nx,ny,nlayers)
+  call var2svar(qbar,sqbar,nx,ny,nlayers)
+  call sq2spsi(sqbar,spsibar,nx,ny,nlayers)
+  !call svar2var(spsibar,psibar,nx,ny,nlayers)
 
   ! Copy same mean state in both layers in case of two layers
   if (nlayers==2) then
-     qbar  (:,:,2)=  qbar(:,:,1)
-     psibar(:,:,2)=psibar(:,:,1)
+     sqbar  (:,:,2)=  sqbar(:,:,1)
+     spsibar(:,:,2)=spsibar(:,:,1)
   endif
 
   return

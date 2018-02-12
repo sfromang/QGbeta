@@ -179,20 +179,23 @@ end subroutine rawFilter
 !###########################################################
 subroutine sq2spsi(sq,spsi,nx,ny,nlayers)
   use const
-  use user_params
   implicit none
   integer :: nx,ny,nlayers
-  complex(dp), dimension(1:nx,1:ny,1:nlayers) :: sq,spsi
+  complex(dp), dimension(1:nx,1:ny,1:nlayers), intent(in) :: sq
+  complex(dp), dimension(1:nx,1:ny,1:nlayers), intent(out) :: spsi
 
   complex(dp), dimension(1:nx,1:ny) :: sq_s,sq_d,spsi_s,spsi_d
   integer :: ilayer
 
+  ! Initialize arrays
+  spsi_s=0.d0 ; spsi_d=0.d0
+
   ! Compute solution of Poisson equation
   sq_s=half*(sq(:,:,1)+sq(:,:,nlayers)) ; sq_d=half*(sq(:,:,1)-sq(:,:,nlayers))
-  call poissonfft(sq_s,spsi_s,.false.) 
+  call poissonfft(sq_s,spsi_s,.false.)
   if (nlayers==2) call poissonfft(sq_d,spsi_d,.true.) 
   spsi(:,:,1)=spsi_s+spsi_d
-  spsi(:,:,2)=spsi_s-spsi_d
+  if (nlayers==2) spsi(:,:,2)=spsi_s-spsi_d
 
   return
 end subroutine sq2spsi
@@ -201,7 +204,6 @@ end subroutine sq2spsi
 !===============================================================================
 subroutine spsi2sq(spsi,sq,nx,ny,nlayers,LambdaInvSq)
   use const
-  use user_params
   implicit none
   integer :: nx,ny,nlayers
   complex(dp), dimension(1:nx,1:ny,1:nlayers) :: spsi,sq

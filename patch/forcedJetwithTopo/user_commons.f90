@@ -6,7 +6,6 @@ module user_params
 
   !Dissipation variables
   real(dp) :: tau,tauM                            !< Forcing & frictionnal timescales
-  real(dp) :: nuH                                 !< Hyperdiffusion coefficient
 
   !Forcing variables
   character(len=10) :: forcingType                !< Forcing type ('tian' or 'charney')
