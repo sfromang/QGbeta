@@ -19,7 +19,6 @@
 !===============================================================================
 subroutine poissonfft(sq,spsi,withSource)
   use params
-  use user_params
   implicit none
 
   logical , intent(in) :: withSource

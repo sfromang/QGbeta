@@ -53,11 +53,6 @@ subroutine condinit
   ! Compute vorticity forcing
   call getForcingAmp(time)
   call computeForcing
-  do j=1,ny
-     do i=1,nx
-        write (*,*) 'yo',i,j,sqbar(i,j,1)
-     end do
-  end do
 
   ! Initial flow
   call initRandom
@@ -77,9 +72,6 @@ subroutine condinit
 
   ! Compute PV
   call getQ(psi,q) ; call computeBC(q,nx,ny,nlayers)
-
-  write (*,*) maxval(psibar)
-  stop
 
   ! Initial flow from existing equilibrium state (stored in files zonal.bin and blocked.bin)
   if (scaling>=0) then
@@ -204,7 +196,6 @@ subroutine computeForcing
         f1=-(y(j)-y1)**2/y0**2
         f2=-(y(j)+y1)**2/y0**2
         qbar(0:nx+1,j,1)=A*(exp(f1)-7.d0/13.d0*exp(f2))
-        write (*,*) j,qbar(0:nx+1,j,1)
      end do
   endif
   if (forcingType=='charney') then
@@ -216,7 +207,7 @@ subroutine computeForcing
   ! Dirichlet lateral BC (with psi=0)
   call var2svar(qbar,sqbar,nx,ny,nlayers)
   call sq2spsi(sqbar,spsibar,nx,ny,nlayers)
-  !call svar2var(spsibar,psibar,nx,ny,nlayers)
+  call svar2var(spsibar,psibar,nx,ny,nlayers)
 
   ! Copy same mean state in both layers in case of two layers
   if (nlayers==2) then
