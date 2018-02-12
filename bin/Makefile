@@ -195,7 +195,7 @@ MPI_MODULEOBJ =
 MPIOBJ        = 
 
 MODULEOBJ = commons.o user_commons.o
-MHDOBJ = condinit.o user_restart.o fftrtools.o fftctools.o source_term.o init.o output.o history.o scheme.o poissonfft.o boundary.o QGbeta.o 
+MHDOBJ = condinit.o user_restart.o fftrtools.o fftctools.o source_term.o init.o output.o history.o scheme.o poissonfft.o boundary.o dissip.o QGbeta.o 
 
 ifeq ($(WITHMPI),1)
 ALLOBJ = $(MPI_MODULEOBJ) $(MODULEOBJ) $(MHDOBJ) $(MPIOBJ)
