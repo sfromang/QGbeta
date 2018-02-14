@@ -16,9 +16,9 @@ module user_params
 
 
   !Topographic variables
-  character(len=10) :: topoType                   !< Topography type ('tian' or 'charney')
-  real(dp) :: h0                                  !< Topography maximum height
-  real(dp), dimension(:,:), allocatable :: hB     !< Topography at each cells
+  character(len=10) :: topoType                     !< Topography type ('tian' or 'charney')
+  real(dp) :: h0                                    !< Topography maximum height
+  real(dp), dimension(:,:), allocatable :: hB,dhBdx !< Topography at each cells
   
 
 end module user_params

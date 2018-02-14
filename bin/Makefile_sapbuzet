@@ -3,7 +3,7 @@
 # Possible choice are: undefined, INTEL, MACOSX, COAST, PGF90, INTEL_TITANE, 
 # INTEL_GRAPHI, TURING
 #############################################################################
-PATCH = ../patch/forcedJet
+PATCH = ../patch/forcedJetwithTopo
 #############################################################################
 
 ifeq ($(HDF5),1)
@@ -186,7 +186,7 @@ endif
 VPATH=$(PATCH):../mpi:../src:../output
 #############################################################################
 INC   = -I/dsm/mri/data4/sfromang/usr/fftw-3.3.6/include
-LIB   = -L../fftpack5.1/lib -L/dsm/mri/data4/sfromang/usr/fftw-3.3.6/lib -lfftpack -lfftw3
+LIB   = -L/dsm/mri/data4/sfromang/usr/fftw-3.3.6/lib -lfftw3
 #############################################################################
 # All objects
 MPI_MODULEOBJ = 

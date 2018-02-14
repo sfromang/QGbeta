@@ -56,11 +56,11 @@ subroutine condinit
 
   ! Initial flow
   call initRandom
-  psi(:,:,1)=0.d0 ; psi(:,:,2)=0.d0
+  psi(:,:,1:nlayers)=0.d0
   iseed=0
   do j=1,ny
      do i=1,nx
-        do ilayer=1,2
+        do ilayer=1,nlayers
            call random_number(rvalue)
            psi(i,j,ilayer)=psibar(i,j,ilayer)+psibar(i,j,ilayer)*amp*(rvalue-0.5)
         end do
@@ -72,6 +72,7 @@ subroutine condinit
 
   ! Compute PV
   call getQ(psi,q) ; call computeBC(q,nx,ny,nlayers)
+  q=qbar
 
   ! Initial flow from existing equilibrium state (stored in files zonal.bin and blocked.bin)
   if (scaling>=0) then
@@ -91,12 +92,12 @@ subroutine condinit
   !stop
 
   ! Compute FFT and store variable in spectral space
-  call var2svar(psibar,spsibar,nx,ny,nlayers)
+  !call var2svar(psibar,spsibar,nx,ny,nlayers)
   call var2svar(q,sq,nx,ny,nlayers)
   call var2svar(psi,spsi,nx,ny,nlayers)
-  call svar2var(spsi,psi,nx,ny,nlayers)
-  call spsi2sq(spsi,sq,nx,ny,nlayers,LambdaInvSq)
-  call svar2var(sq,q,nx,ny,nlayers)
+  !call svar2var(spsi,psi,nx,ny,nlayers)
+  !call spsi2sq(spsi,sq,nx,ny,nlayers,LambdaInvSq)
+  !call svar2var(sq,q,nx,ny,nlayers)
   call computeBCzeroGrad(q,nx,ny,nlayers)
   call computeBCzeroGrad(psi,nx,ny,nlayers)
 
@@ -212,7 +213,10 @@ subroutine computeForcing
 
   ! Dirichlet lateral BC (with psi=0)
   call var2svar(qbar,sqbar,nx,ny,nlayers)
+  call dealiasing(sqbar,nx,ny,nlayers)
+  call svar2var(sqbar,qbar,nx,ny,nlayers)
   call sq2spsi(sqbar,spsibar,nx,ny,nlayers)
+  call dealiasing(spsibar,nx,ny,nlayers)
   call svar2var(spsibar,psibar,nx,ny,nlayers)
 
   return
@@ -222,13 +226,14 @@ end subroutine computeForcing
 !===============================================================================
 subroutine computeTopography
   use params
-  use variables , only : x,y
-  use user_params , only : topoType,h0,hB
+  use variables , only : x,y,qbar,sqbar
+  use user_params , only : topoType,h0,hB,dhBdx
   implicit none
-  real(dp) :: x0,x1,dxB0,hB1,hB2,dhBdx
+  real(dp) :: x0,x1,dxB0,hB1,hB2,dhB1dx,dhB2dx
   integer :: i,j
 
-  if (.not.(allocated(hB))) allocate(hB(0:nx+1,0:ny+1)) ; hB=0.d0
+  if (.not.(allocated( hB)))   allocate( hB(0:nx+1,0:ny+1)) ;    hB=0.d0
+  if (.not.(allocated(dhBdx))) allocate(dhBdx(0:nx+1,0:ny+1)) ; dhBdx=0.d0
 
   if ((topoType=='tianJFM').or.(topoType=='tianSeb')) then
      if (topoType=='tianJFM') dxB0=0.968d0 !JFM paper setup
@@ -237,7 +242,10 @@ subroutine computeTopography
      do i=0,nx+1
         hB1=h0*exp(-(x(i)-x0)**2/dxB0**2) !h0*exp(-(x(i)-x0)**2/2.d0/dxB0**2)
         hB2=h0*exp(-(x(i)-x1)**2/dxB0**2) !exp(-(x(i)-x1)**2/2.d0/dxB0**2)
-        hB(i,:)=hB1+hB2
+        dhB1dx=-2.d0*(x(i)-x0)/dxB0**2*hB1
+        dhB2dx=-2.d0*(x(i)-x1)/dxB0**2*hB2
+         hB  (i,:)= hB1  + hB2
+        dhBdx(i,:)=dhB1dx+dhB2dx
      end do
   endif
   if (topoType=='charney') then

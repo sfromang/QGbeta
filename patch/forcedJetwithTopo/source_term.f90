@@ -8,9 +8,9 @@ subroutine source_term
   use variables
   implicit none
   real(dp), dimension(0:nx+1,0:ny+1) :: xi
-  real(dp), dimension(0:nx+1,0:ny+1,nlayers) :: dtmp,dterm
-  real(dp), dimension(0:nx+1,0:ny+1,1:nlayers)  :: dqdt_topo
-  complex(dp), dimension(1:nx,1:ny,1:nlayers)  :: dsqdt_topo
+  real(dp), dimension(0:nx+1,0:ny+1,nlayers) :: dtmp,dterm,tmp
+  real(dp), dimension(0:nx+1,0:ny+1,1:nlayers)  :: dqdt_topo,dhBdy
+  complex(dp), dimension(1:nx,1:ny,1:nlayers)  :: dsqdt_topo,sdhBdx,sdhBdy,sduhBdx,sdvhBdy
   real(dp) :: psiR
   integer :: ilayer,i,j
   !forcing parameters
@@ -32,6 +32,9 @@ subroutine source_term
   dqdt_topo=0.d0 ; dsqdt_topo=0.d0
   call su2u(su,u,nx,ny,nlayers)
   call svar2var(sv,v,nx,ny,nlayers)
+  call computeBCzeroGrad(u,nx,ny,nlayers)
+  call computeBC(v,nx,ny,nlayers)
+  v(:,0,:)=0.d0 ; v(:,ny+1,:)=0.d0
   do j=1,ny
      do i=1,nx
         dqdt_topo(i,j,nlayers) = - (hB(i+1,j)*u(i+1,j,nlayers)-hB(i-1,j)*u(i-1,j,nlayers))/2.d0/dx \
@@ -40,6 +43,42 @@ subroutine source_term
   end do
   call var2svar(dqdt_topo,dsqdt_topo,nx,ny,nlayers)
   dsqdt=dsqdt+dsqdt_topo
+  !dsqdt=dsqdt_topo
+  !call svar2var(dsqdt,qbar,nx,ny,nlayers)
+
+  ! ! Bottom layer topography
+  ! tmp(:,:,1)=dhBdx
+  ! !call computeBCzeroGrad(u,nx,ny,nlayers)
+  ! call var2svar(u*tmp,dsqdt_topo,nx,ny,nlayers)
+  ! call dealiasing(dsqdt_topo,nx,ny,nlayers)
+  ! dsqdt=dsqdt-dsqdt_topo
+  ! dsqdt=-dsqdt_topo
+
+  ! ! Bottom layer topography
+  ! tmp(:,:,1)=hB
+  ! call su2u(su,u,nx,ny,nlayers)
+  ! call var2svar(u*tmp,sduhBdx,nx,ny,nlayers)
+  ! call deriveTypeII(sduhBdx,nx,ny,nlayers,2.d0*pi/(xmax-xmin),1)
+
+  ! call svar2var(sv,v,nx,ny,nlayers)
+  ! call var2svar(v*tmp,sdvhBdy,nx,ny,nlayers)
+  ! call deriveTypeII(sdvhBdy,nx,ny,nlayers,2.d0*pi/(ymax-ymin),2)
+
+  ! dsqdt=dsqdt-sduhBdx-sdvhBdy
+
+  !    ! Compute u*dq/dx in spectral space
+  !    call su2u(su,u,nx,ny,nlayers)
+  !    dsqdx=sq
+  !    call deriveTypeII(dsqdx,nx,ny,nlayers,2.d0*pi/(xmax-xmin),1)
+  !    call svar2var(dsqdx,dqdx,nx,ny,nlayers)
+  !    call var2svar(u*dqdx,sduqdx,nx,ny,nlayers)
+
+  !    ! Compute v*dq/dy in spectral space
+  !    call svar2var(sv,v,nx,ny,nlayers)
+  !    dsqdy=sq
+  !    call deriveTypeII(dsqdy,nx,ny,nlayers,2.d0*pi/(ymax-ymin),2)
+  !    call su2u(dsqdy,dqdy,nx,ny,nlayers)
+  !    call var2svar(v*dqdy,sdvqdy,nx,ny,nlayers)
 
   ! TBD FOR FFT VERSION - SEB - 12/02/18
   ! ! Noise forcing (amp=1.d0 for first model that worked)

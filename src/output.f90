@@ -23,6 +23,9 @@ subroutine output
   !   call svar2var(spsi,psi,nx,ny,nlayers)                   ! Transform psi back to real space
   !   call var2svar(psi,spsi,nx,ny,nlayers)
   !end do
+  call sq2spsi(sq,spsi,nx,ny,nlayers)
+  call spsi2su(spsi,su,nx,ny,nlayers,2.d0*pi/(ymax-ymin)) ! Compute u in spectral space
+  call spsi2sv(spsi,sv,nx,ny,nlayers,2.d0*pi/(xmax-xmin)) ! Compute v in spectral space
   call svar2var(spsi,psi,nx,ny,nlayers)                   ! Transform psi back to real space
   call computeBCzeroGrad(psi,nx,ny,nlayers)
   call svar2var(sq,q,nx,ny,nlayers)                       ! Transform q back to real space

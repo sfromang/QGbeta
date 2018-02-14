@@ -61,8 +61,8 @@ class qgData:
                 'v'  : self.v[imin:imax,jmin:jmax,ilevel],\
                 'qbar'  : self.qbar[imin:imax,jmin:jmax,ilevel],\
                 'psibar': self.psibar[imin:imax,jmin:jmax,ilevel],\
-                'qprime'  : self.q[imin:imax,jmin:jmax,ilevel],\
-                'psiprime': self.psi[imin:imax,jmin:jmax,ilevel],\
+                'qprime'  : self.q[imin:imax,jmin:jmax,ilevel]-self.qbar[imin:imax,jmin:jmax,ilevel],\
+                'psiprime': self.psi[imin:imax,jmin:jmax,ilevel]-self.psibar[imin:imax,jmin:jmax,ilevel],\
                 'psiS': np.sum(self.psi[imin:imax,jmin:jmax,:]+self.psibar[imin:imax,jmin:jmax,:],2)}
         return dicVar[type]
 

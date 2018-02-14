@@ -44,14 +44,20 @@ subroutine getUpdate
 
   ! Compute q(t+dt) using 3rd order Adam-Bashforth scheme
   if (time>0.d0) then
-     sqp1=sq+dt/12.d0*(23.d0*dsqdt-16.d0*dsqdtm1+5.d0*dsqdtm2)
+     if (time>dt) then
+        sqp1=sq+dt/12.d0*(23.d0*dsqdt-16.d0*dsqdtm1+5.d0*dsqdtm2)
+     else
+        sqp1=sq+dt/2.d0*(3.d0*dsqdt-dsqdtm1)
+     endif
   else
      sqp1=sq+dsqdt*dt
   endif
   dsqdtm2=dsqdtm1 ; dsqdtm1=dsqdt ; dsqdt=0.d0
   sqm1=sq ; sq=sqp1 ; spsim1=spsi
   
+  call dealiasing(sq,nx,ny,nlayers)
 
+  return
 end subroutine getUpdate
 !###########################################################
 !###########################################################

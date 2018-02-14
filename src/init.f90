@@ -177,8 +177,6 @@ subroutine initfft
   scalex=twopi/(xmax-xmin)
   scaley=twopi/(ymax-ymin)
 
-
-
   if (typeBC==1) then
      
      ! Computing kx & ky
@@ -209,8 +207,8 @@ subroutine initfft
      do i=nx/2+1,nx
         kx2(i,:)=+(i-nx-1)*(i-nx-1)
      end do
-
      kx2 = scalex**2 * kx2
+
      ky2(1:nx,1)=0.d0
      do j=2,ny
         ky2(1:nx,j)=+(j-1)*(j-1)/4.
