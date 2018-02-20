@@ -25,7 +25,7 @@ subroutine condinit
   Amax=2.d0
   Ainc=1.d0
   kappa=5.d-3
-  nuH=5.d-5         ! Hyperdiffusion coefficient
+  !nuH=5.d-5         ! Hyperdiffusion coefficient
   topoType='tianJFM'
   tauM=1.d1         ! Bottom layer friction
   h0=0.1d0          ! Bottom topography height
@@ -73,7 +73,29 @@ subroutine condinit
   ! Compute PV
   call getQ(psi,q) ; call computeBC(q,nx,ny,nlayers)
   q=qbar
+  ! do j=1,ny
+  !    do i=1,nx
+  !       do ilayer=1,nlayers
+  !          call random_number(rvalue)
+  !          qbar(i,j,ilayer)=cos(2.*twopi/(xmax-xmin)*x(i))*cos(2*pi/(ymax-ymin)*y(j))
+  !       end do
+  !    end do
+  ! end do
+  ! call var2svar(qbar,sqbar,nx,ny,nlayers)
+  ! do j=1,ny
+  !    write (*,*) j,kx2(2,j),ky2(2,j),sqbar(2,j,1)
+  ! end do
+  ! call sq2spsi(sqbar,spsibar,nx,ny,nlayers)
+  ! call spsi2sq(spsibar,sqbar,nx,ny,nlayers)
+  ! call svar2var(sqbar,qbar,nx,ny,nlayers)
+  ! call svar2var(spsibar,psibar,nx,ny,nlayers)
+  ! q=qbar ; psi=psibar
 
+  !sqbar=0.d0
+  !sqbar(2,2,1)=cmplx(1.d0,0.d0)
+  !call svar2var(sqbar,qbar,nx,ny,nlayers) ; call computeBC(q,nx,ny,nlayers)
+
+  
   ! Initial flow from existing equilibrium state (stored in files zonal.bin and blocked.bin)
   if (scaling>=0) then
      call computeInitFlow(scaling)
