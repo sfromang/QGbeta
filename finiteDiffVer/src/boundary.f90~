@@ -1,0 +1,37 @@
+!###########################################################
+!###########################################################
+!###########################################################
+subroutine computeBC(array,nx,ny,nlayers)
+  use precision
+  implicit none
+  integer :: nx,ny,nlayers
+  real(dp), dimension(0:nx+1,0:ny+1,1:nlayers) :: array
+
+  ! Periodic BC in x
+  array(0,:,:)=array(nx,:,:) ; array(nx+1,:,:)=array(1,:,:)
+  ! Periodic BC in y
+  array(:,0,:)=array(:,ny,:) ; array(:,ny+1,:)=array(:,1,:)
+  ! zero gradient in y
+  array(:,0,:)=array(:,1,:) ; array(:,ny+1,:)=array(:,ny,:)
+  ! Dirichlet (=0) in y
+  array(:,0,:)=0.d0 ; array(:,ny+1,:)=0.d0
+
+  return
+end subroutine computeBC
+!###########################################################
+!###########################################################
+!###########################################################
+subroutine computeBCzeroGrad(array,nx,ny,nlayers)
+  use precision
+  implicit none
+  integer :: nx,ny,nlayers
+  real(dp), dimension(0:nx+1,0:ny+1,1:nlayers) :: array
+
+  ! Periodic BC in x
+  array(0,:,:)=array(nx,:,:) ; array(nx+1,:,:)=array(1,:,:)
+  ! Zero-gradient BC in y
+  array(:,0,:)=array(:,1,:) ; array(:,ny+1,:)=array(:,ny,:)
+
+  return
+end subroutine computeBCzeroGrad
+
