@@ -48,28 +48,43 @@ subroutine condinit
         qvortex(i,j)=Avortex*exp(-((x(i)-xvortex-dshift)**2+(y(j)-yvortex)**2)/rvortex**2)
      end do
   end do
-  call computeBC(qvortex,nx,ny)
-  call poissonfft(qvortex,psivortex,.false.)
-  psi(:,:,2)=psivortex
+  call computeBCzeroGrad(qvortex,nx,ny)
+  !call poissonfft(qvortex,psivortex,.false.)
+  psi(:,:,2)=psibar(:,:,2)+psivortex
   qvortex=0. 
   do j=1,ny
      do i=0,nx+1
         qvortex(i,j)=Avortex*exp(-((x(i)-xvortex)**2+(y(j)-yvortex)**2)/rvortex**2)
      end do
   end do
-  call computeBC(qvortex,nx,ny)
-  call poissonfft(qvortex,psivortex,.false.)
-  psi(:,:,1)=psivortex 
-  call computeBC(psi,nx,ny,nlayers)
+  call computeBCzeroGrad(qvortex,nx,ny)
+  !call poissonfft(qvortex,psivortex,.false.)
+  !psi(:,:,1)=psibar(:,:,1)+psivortex 
+  !call computeBC(psi,nx,ny,nlayers)
 
   ! Compute PV
-  call getQ(psi,q) ; call computeBC(q,nx,ny,nlayers)
+  !call getQ(psi,q) ; call computeBC(q,nx,ny,nlayers)
+  q(:,:,1)=qbar(:,:,1)+qvortex
+  q(:,:,2)=qbar(:,:,2)+qvortex
+
+  ! Compute FFT and store variable in spectral space
+  !call var2svar(psibar,spsibar,nx,ny,nlayers)
+  call var2svar(q,sq,nx,ny,nlayers)
+  call sq2spsi(sq,spsi,nx,ny,nlayers)
+  call svar2var(spsi,psi,nx,ny,nlayers)
+  call var2svar(psibar,spsibar,nx,ny,nlayers)
+  !call svar2var(spsi,psi,nx,ny,nlayers)
+  !call spsi2sq(spsi,sq,nx,ny,nlayers,LambdaInvSq)
+  !call svar2var(sq,q,nx,ny,nlayers)
+  call computeBCzeroGrad(q,nx,ny,nlayers)
+  call computeBCzeroGrad(psi,nx,ny,nlayers)
 
   ! Compute other variables (qm1,u,v) for saving purposes.
-  qm1=q
-  call getVel(psi+psibar,u,v)
-  call computeBC(u,nx,ny,nlayers)
-  call computeBC(v,nx,ny,nlayers)
+  sqm1=sq
+  call spsi2su(spsi,su,nx,ny,nlayers,2.d0*pi/(ymax-ymin)) ! Compute u in spectral space
+  call su2u(su,u,nx,ny,nlayers)                           ! Transform u back to real space
+  call spsi2sv(spsi,sv,nx,ny,nlayers,2.d0*pi/(xmax-xmin)) ! Compute v in spectral space
+  call svar2var(sv,v,nx,ny,nlayers)                       ! Transform v back to real space
 
   return
 end subroutine condinit
